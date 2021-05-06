@@ -1,0 +1,73 @@
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D,MaxPooling2D,Flatten,Dense,Dropout,Activation
+import cv2
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+IMG_SIZE=50
+Datadirectory="C:/Users/82105/Desktop/dt/" ##DATASET LOCAL 파일 로드
+Classes=["0","1"]
+training_Data=[]
+
+
+##훈련을 위한 데이터 세트 만들어주는 함수 구현
+def create_training_Data():
+    for category in Classes: ##CLASS 구분
+        path=os.path.join(Datadirectory,category)##"C:/Users/82105/Desktop/datase/category/"
+        class_num=Classes.index(category)##set1,set2를 0과1과 같은 숫자로 변환
+        for img in os.listdir(path):##해당 path에 파일 리스트
+            try:
+                img_array=cv2.imread(os.path.join(path,img),cv2.IMREAD_GRAYSCALE)##회색으로 읽어들이기
+                new_array=cv2.resize(img_array,(IMG_SIZE,IMG_SIZE))
+                training_Data.append([new_array,class_num])  
+            except Exception as e:
+                pass
+            
+            
+          
+        
+create_training_Data()  ##데이터 세트 create
+print(len(training_Data))
+
+import random
+
+random.shuffle(training_Data) #이미지 데이터들 shuffle
+##training_Data[a][b]에서 a는 이미지의 index 
+##b 경우 0은 image 정보를 담은 배열 1은 클래스 번호
+
+
+
+X=[]
+y=[]
+
+##x에는 img정보 y는 label정보 저장
+
+for features,label in training_Data:
+    X.append(features)
+    y.append(label)
+    
+
+X=np.array(X).reshape(-1,IMG_SIZE,IMG_SIZE,1) ##numpy배열을 생성 3차원 데이터를 원소로 갖는 배열
+y=np.array(y)
+
+import pickle
+
+pickle_out =open("X.pickle","wb") ##파일 오픈 파일 포인터 pickle_out에 저장 
+pickle.dump(X,pickle_out)## 객체(값)를 직렬화하여 이진파일 만들기
+pickle_out.close()##닫기
+
+pickle_out=open("y.pickle","wb")
+pickle.dump(y,pickle_out)
+pickle_out.close()
+
+pickle_in=open("X.pickle","rb")
+X=pickle.load(pickle_in) ##파일에서 역직렬화로 객체 만들기
+
+pickle_in=open("y.pickle","rb")
+y=pickle.load(pickle_in)
+
+X=X/255.0
+
+##여기 까지 데이터셋 준비 끝
