@@ -1,0 +1,20 @@
+model= Sequential()
+##Conv2D(커널갯수,(필터크기))
+model.add(Conv2D(32,(3,3),input_shape=(50,50,1)))
+model.add(Activation('relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+
+model.add(Conv2D(64,(3,3)))
+model.add(Activation('relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))      
+      
+model.add(Flatten())
+model.add(Dense(64, activation='relu'))
+model.add(Dense(2,activation='sigmoid'))
+model.summary()
+model.compile(optimizer="adam",loss="binary_categorical_crossentropy",metrics=["accuracy"])
+model.fit(X, y,epochs=10)
+
+#딥러닝 훈련
+##model.save('las_model.h5')
+##model=tf.keras.models.load_mode('las_model.h5')
